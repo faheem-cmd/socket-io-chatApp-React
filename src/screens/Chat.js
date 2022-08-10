@@ -1,24 +1,32 @@
 import "./App.css";
 import io from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTabNotification } from "./TabNotfication";
 import ChatHeader from "./chat/ChatHeader";
 import ChatScreen from "./chat/ChatScreen";
 import ChatInput from "./chat/ChatInput";
-const socket = io.connect("http://192.168.10.79:8000");
+import NotificationSound from "../assets/notification-sound.mp3";
 
+const socket = io.connect("http://192.168.10.79:8000");
 function Chat() {
   const [notification, setNotification] = useTabNotification();
   const [room, setRoom] = useState();
   const [name, setName] = useState();
   const [data1, setData1] = useState([]);
+  const audioPlayer = useRef(null);
+
+  function playAudio() {
+    audioPlayer.current.play();
+  }
   const onUpdate = (room, name) => {
     setRoom(room);
     setName(name);
   };
+
   useEffect(() => {
     socket.on("receive_message", (data) => {
       notification(" 🔴 (1) New Message", 1000);
+      playAudio();
       console.log(data, "eette");
       setData1((oldArray) => [
         ...oldArray,
@@ -33,6 +41,7 @@ function Chat() {
 
   return (
     <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+      <audio ref={audioPlayer} src={NotificationSound} />
       <ChatHeader onUpdate={onUpdate} socket={socket} />
       <ChatScreen data1={data1} />
       <ChatInput
