@@ -12,7 +12,7 @@ const ChatInput = ({ socket, room, name, setNotification, setData1 }) => {
 
   const onEmojiClick = (event, emojiObject) => {
     console.log(emojiObject);
-    setMessage(emojiObject.emoji);
+    setMessage(message + emojiObject.emoji);
   };
 
   const sendMessage = (e) => {
@@ -58,7 +58,8 @@ const ChatInput = ({ socket, room, name, setNotification, setData1 }) => {
             }{" "}
           </InputRightElement>
         </InputGroup>
-        {picker ? <Picker onEmojiClick={onEmojiClick} /> : null}
+        {picker && <Picker onEmojiClick={onEmojiClick} />}
+
         <Button
           disabled={message.length >= 1 ? false : true}
           colorScheme="red"
