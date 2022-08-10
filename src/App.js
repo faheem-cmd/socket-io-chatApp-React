@@ -7,14 +7,9 @@ function App() {
   return (
     <ChakraProvider>
       <Router>
-        {/* 
-        <div className="auth-wrapper">
-          <div className="auth-inner"> */}
         <Routes>
           <Route exact path="/" element={<Chat />} />
         </Routes>
-        {/* </div>
-        </div> */}
       </Router>
     </ChakraProvider>
   );
