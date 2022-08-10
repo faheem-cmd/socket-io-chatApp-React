@@ -1,6 +1,6 @@
 import "./App.css";
 import io from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
@@ -28,6 +28,11 @@ function Chat() {
       console.log(room, "jiji");
       alert("Conncected Succesfully");
     }
+  };
+
+  const messagesEndRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const sendMessage = (e) => {
@@ -158,6 +163,7 @@ function Chat() {
         }}
       >
         <div
+          ref={messagesEndRef}
           style={{
             width: "52%",
             height: 500,
