@@ -1,10 +1,17 @@
 import "./App.css";
 import io from "socket.io-client";
 import { useEffect, useState, useRef } from "react";
-import { Button, ButtonGroup } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
+import {
+  Avatar,
+  Button,
+  ButtonGroup,
+  InputRightElement,
+} from "@chakra-ui/react";
+import { Input, InputGroup } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
 import { useTabNotification } from "./TabNotfication";
+import Picker from "emoji-picker-react";
+import { FcLinux } from "react-icons/fc";
 const socket = io.connect("http://192.168.10.79:8000");
 
 function Chat() {
@@ -14,12 +21,17 @@ function Chat() {
   const [notification, setNotification] = useTabNotification();
 
   // Messages States
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState();
   const [messageReceived, setMessageReceived] = useState([]);
 
   const [message2, setMessage2] = useState("");
 
   const [data1, setData1] = useState([]);
+  const [picker, setPicker] = useState(false);
+  const onEmojiClick = (event, emojiObject) => {
+    console.log(emojiObject);
+    setMessage(emojiObject.emoji);
+  };
 
   const joinRoom = () => {
     if (room !== "") {
@@ -265,15 +277,22 @@ function Chat() {
         }}
       >
         <form onSubmit={sendMessage} style={{ display: "flex" }}>
-          <Input
-            onClick={() => setNotification()}
-            onChange={(event) => {
-              setMessage(event.target.value);
-            }}
-            placeholder="Enter message"
-            style={{ bottom: 3, right: 8, width: "680px" }}
-            value={message}
-          />
+          <InputGroup size="md">
+            <Input
+              pr="4.5rem"
+              onClick={() => setNotification()}
+              onChange={(event) => {
+                setMessage(event.target.value);
+              }}
+              placeholder="Enter message"
+              style={{ bottom: 3, right: 14, width: "680px" }}
+              value={message}
+            />
+            <InputRightElement width="4.5rem">
+              {<FcLinux fontSize={30} onClick={() => setPicker(!picker)} />}
+            </InputRightElement>
+          </InputGroup>
+          {picker ? <Picker onEmojiClick={onEmojiClick} /> : null}
           <Button
             colorScheme="red"
             type="submit"
@@ -286,5 +305,4 @@ function Chat() {
     </div>
   );
 }
-
 export default Chat;
