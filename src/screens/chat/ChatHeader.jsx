@@ -6,12 +6,19 @@ const ChatHeader = ({ onUpdate, socket }) => {
   const [name, setName] = useState("");
 
   const joinRoom = () => {
-    if (room !== "") {
-      socket.emit("join_room", room);
-      socket.emit("name", name);
-      console.log(room, "jiji");
-      alert("Conncected Succesfully");
-      console.log(room, name, "condition");
+    if (room.length === 0 && name.length === 0) {
+      alert("Please enterChatRoom ID");
+    } else if (room.length === 0) {
+      alert("Enter RoomId");
+    } else if (name.length === 0) {
+      alert("Please enter your name");
+    } else {
+      if (room !== "") {
+        socket.emit("join_room", room);
+        socket.emit("name", name);
+        console.log(room, "jiji");
+        alert("Conncected Succesfully");
+      }
     }
   };
   const onClickButton = () => {
