@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
+import { useTabNotification } from "./TabNotfication";
 const socket = io.connect("http://192.168.10.79:8000");
 
 function Chat() {
   //Room State
   const [room, setRoom] = useState("");
+  const [name, setName] = useState("");
+  const [notification, setNotification] = useTabNotification();
 
   // Messages States
   const [message, setMessage] = useState("");
@@ -21,22 +24,26 @@ function Chat() {
   const joinRoom = () => {
     if (room !== "") {
       socket.emit("join_room", room);
+      socket.emit("name", name);
       console.log(room, "jiji");
       alert("Conncected Succesfully");
     }
   };
 
-  const sendMessage = () => {
-    socket.emit("send_message", { message, room });
+  const sendMessage = (e) => {
+    e.preventDefault();
+    socket.emit("send_message", { message, room, name });
     setData1((oldArray) => [...oldArray, { id: true, message: message }]);
+    setMessage("");
   };
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
-      console.log(data);
+      notification(" 🔴 (1) New Message", 1000);
+      console.log(data, "eette");
       setData1((oldArray) => [
         ...oldArray,
-        { id: false, message: data.message },
+        { id: false, message: data.message, name: data.name },
       ]);
     });
   }, [socket]);
@@ -122,6 +129,19 @@ function Chat() {
                 paddingLeft: 10,
               }}
             />
+            <div style={{ padding: 3 }} />
+            <input
+              placeholder="Name"
+              onChange={(event) => {
+                setName(event.target.value);
+              }}
+              style={{
+                borderRadius: 10,
+                elevation: 3,
+                height: 30,
+                paddingLeft: 10,
+              }}
+            />
           </div>
           <Button colorScheme="orange" onClick={joinRoom}>
             Join
@@ -153,7 +173,7 @@ function Chat() {
           }}
           onScroll={handleScroll}
         >
-          {uniqElements.map((item) => (
+          {data1.map((item) => (
             <div
               style={{
                 padding: 10,
@@ -161,6 +181,28 @@ function Chat() {
                 display: "flex",
               }}
             >
+              <div style={{}}>
+                <p
+                  style={{
+                    alignItems: "center",
+                    alignSelf: "center",
+                    justifyContent: "center",
+                    fontSize: 10,
+                    fontWeight: "bold",
+                    backgroundColor: "pink",
+                    elevation: 2,
+                    width: 50,
+                    height: 50,
+                    borderRadius: 200,
+                    textAlign: "center",
+                    flex: 1,
+                    display: "flex",
+                    color: "blue",
+                  }}
+                >
+                  {item.name || "you"}
+                </p>
+              </div>
               <div
                 style={{
                   padding: 10,
@@ -212,24 +254,28 @@ function Chat() {
           flex: 1,
           width: "50%",
           display: "flex",
-          bottom: 10,
+          bottom: -54,
           position: "absolute",
         }}
       >
-        <Input
-          onChange={(event) => {
-            setMessage(event.target.value);
-          }}
-          placeholder="Enter message"
-          style={{ bottom: 3, right: 6 }}
-        />
-        <Button
-          onClick={sendMessage}
-          colorScheme="red"
-          style={{ width: 60, marginHorizontal: 15, left: 6, bottom: 3 }}
-        >
-          <p style={{ fontSize: 12 }}>Send</p>
-        </Button>
+        <form onSubmit={sendMessage} style={{ display: "flex" }}>
+          <Input
+            onClick={() => setNotification()}
+            onChange={(event) => {
+              setMessage(event.target.value);
+            }}
+            placeholder="Enter message"
+            style={{ bottom: 3, right: 8, width: "680px" }}
+            value={message}
+          />
+          <Button
+            colorScheme="red"
+            type="submit"
+            style={{ width: 60, marginHorizontal: 15, left: 6, bottom: 3 }}
+          >
+            <p style={{ fontSize: 12 }}>Send</p>
+          </Button>
+        </form>
       </div>
     </div>
   );
